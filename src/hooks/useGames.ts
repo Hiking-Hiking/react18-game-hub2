@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { GameQuery } from "../App";
-import { FetchResponse } from "../services/api-client";
-import apiClient from "../services/api-client";
+import APIClient, { FetchResponse } from "../services/api-client";
 import { Platform } from "./usePlatforms";
 
 export interface Game {
@@ -12,21 +11,22 @@ export interface Game {
   metacritic: number;
   rating_top: number;
 }
-
+//实例化APIClient类，传入endpoint参数'/genres';
+const apiClient = new APIClient<Game>("/games");
 const useGames = (gameQuery: GameQuery) =>
   useQuery<FetchResponse<Game>, Error>({
     queryKey: ["games", gameQuery],
-    queryFn: () =>
-      apiClient
-        .get<FetchResponse<Game>>("/games", {
-          params: {
-            genres: gameQuery.genre?.id,
-            parent_platforms: gameQuery.platform?.id,
-            ordering: gameQuery.sortOrder,
-            search: gameQuery.searchText,
-          },
-        })
-        .then((res) => res.data),
+    //queryFn是需要引用apiClient.getAll方法，不是调用它的结果；使用箭头函数，函数里返回对apiClient.getAll的引用，并给apiClient.getAll传入筛选参数；
+    queryFn: () => {
+      return apiClient.getAll({
+        params: {
+          genres: gameQuery.genre?.id,
+          parent_platforms: gameQuery.platform?.id,
+          ordering: gameQuery.sortOrder,
+          search: gameQuery.searchText,
+        },
+      });
+    },
   });
 
 export default useGames;
