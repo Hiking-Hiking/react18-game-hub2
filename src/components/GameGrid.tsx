@@ -1,5 +1,6 @@
-import { Box, Button, SimpleGrid, Text } from "@chakra-ui/react";
+import { SimpleGrid, Spinner, Text } from "@chakra-ui/react";
 import React from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { GameQuery } from "../App";
 import useGames from "../hooks/useGames";
 import GameCard from "./GameCard";
@@ -20,14 +21,24 @@ const GameGrid = ({ gameQuery }: Props) => {
     hasNextPage,
   } = useGames(gameQuery);
   const skeletons = [1, 2, 3, 4, 5, 6];
-
-  console.log("游戏获取到的data", data);
-
+  // console.log("游戏获取到的data", data);
+  const fetchedGamesGount =
+    data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
+  //dataLength属性需要的是number类型的值，而fetchedGamesGount的类型默认是number | undefined，因为默认初始值可能是undefined，所以这里用 '...|| 0'，给fetchedGamesGount初始值为0，这样fetchedGamesGount的类型就是number。
   if (error) return <Text>{error.message}</Text>;
 
   return (
-    <Box padding="10px">
-      <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} spacing={6}>
+    <InfiniteScroll
+      dataLength={fetchedGamesGount}
+      hasMore={!!hasNextPage}
+      next={() => fetchNextPage()}
+      loader={<Spinner />}
+    >
+      <SimpleGrid
+        columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
+        spacing={6}
+        padding="10px"
+      >
         {isLoading &&
           skeletons.map((skeleton) => (
             <GameCardContainer key={skeleton}>
@@ -44,14 +55,7 @@ const GameGrid = ({ gameQuery }: Props) => {
           </React.Fragment>
         ))}
       </SimpleGrid>
-      {/* 添加按钮，动态显示按钮和按钮中的文字 */}
-      {hasNextPage && (
-        //添加点击事件，直接调用fetchNextPage()获取下一页数据
-        <Button onClick={() => fetchNextPage()} marginY={5}>
-          {isFetchingNextPage ? "Loading..." : "Load more"}
-        </Button>
-      )}
-    </Box>
+    </InfiniteScroll>
   );
 };
 
