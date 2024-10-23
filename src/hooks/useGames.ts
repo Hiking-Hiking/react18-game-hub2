@@ -38,6 +38,7 @@ const useGames = (gameQuery: GameQuery) =>
       // allPages包含我们当前检索到的每个页面的数据；所以直接用它的长度加1；
       return lastPage.next ? allPages.length + 1 : undefined;
     },
+    staleTime: 24 * 60 * 60 * 1000, //缓存时间：24h
   });
 
 export default useGames;
