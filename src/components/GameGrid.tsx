@@ -22,14 +22,17 @@ const GameGrid = ({ gameQuery }: Props) => {
   } = useGames(gameQuery);
   const skeletons = [1, 2, 3, 4, 5, 6];
   // console.log("游戏获取到的data", data);
+
   const fetchedGamesGount =
     data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
   //dataLength属性需要的是number类型的值，而fetchedGamesGount的类型默认是number | undefined，因为默认初始值可能是undefined，所以这里用 '...|| 0'，给fetchedGamesGount初始值为0，这样fetchedGamesGount的类型就是number。
+
   if (error) return <Text>{error.message}</Text>;
 
   return (
     <InfiniteScroll
       dataLength={fetchedGamesGount}
+      // 直接写hasMore = {hasNextPage}，类型报错，因为hasMore需要的是boolean，而hasNextPage默认是 boolean | undefined;使用双重感叹号，hasMore={!!hasNextPage},将hasNextPage转换为真实的布尔值，undefined会被转换为false；
       hasMore={!!hasNextPage}
       next={() => fetchNextPage()}
       loader={<Spinner />}

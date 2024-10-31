@@ -10,8 +10,14 @@ import { Platform } from "./hooks/usePlatforms";
 import { Genre } from "./hooks/useGenres";
 
 export interface GameQuery {
-  genre: Genre | null;
-  platform: Platform | null;
+  // genre: Genre | null;
+  // undefined和null的区别： undefined：表示没有值（the absence of a value）; null：表示现在故意没有值（the intentional absence of a value now）
+  // 这里选择 undefined，因为在应用程序中，用户最初没有选择流派genre或者平台platform，但是一旦他们选择了genre，他们就没有办法显示取消它，所以这里选择undefined是可以的。
+  // genre: Number | undefined 进一步简化为 genre?:Number，效果一样。
+  // 将genre重命名为 genreId；
+  genreId?: number;
+  // platform: Platform | null;
+  platformId?: number;
   sortOrder: string;
   searchText: string;
 }
@@ -38,8 +44,10 @@ function App() {
       <Show above="lg">
         <GridItem area="aside" paddingX={5}>
           <GenreList
-            selectedGenre={gameQuery.genre}
-            onSelectGenre={(genre) => setGameQuery({ ...gameQuery, genre })}
+            selectedGenreId={gameQuery.genreId}
+            onSelectGenre={(genre) =>
+              setGameQuery({ ...gameQuery, genreId: genre.id })
+            }
           />
         </GridItem>
       </Show>
@@ -49,9 +57,9 @@ function App() {
           <Flex marginBottom={5}>
             <Box marginRight={5}>
               <PlatformSelector
-                selectedPlatform={gameQuery.platform}
+                selectedPlatformId={gameQuery.platformId}
                 onSelectPlatform={(platform) =>
-                  setGameQuery({ ...gameQuery, platform })
+                  setGameQuery({ ...gameQuery, platformId: platform.id })
                 }
               />
             </Box>
